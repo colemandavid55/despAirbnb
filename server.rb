@@ -40,6 +40,7 @@ class DespAirbnb::Server < Sinatra::Application
     # 5. Filter all data such that it's at least x-miles from coord, and data 'id' is unique (This creates a hash)
     # 6. Add filtered data to map as GPS Coordinates
     # 7. return new map so we can display it on the front end, else return status error
+    
     erb :index
   end
 

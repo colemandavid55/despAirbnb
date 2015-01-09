@@ -83,7 +83,7 @@ module EnsnareBnb
             location: location,
             name: name,
             price: price.to_i,
-            lattitude: lat,
+            latitude: lat,
             longitude: lng,
             roomUrl: url,
             imgUrl: img
@@ -98,6 +98,7 @@ module EnsnareBnb
         # prevent bombarding the server with too many requests at once (default=>1)
         sleep(sleep_time)
       end
+      File.open("results.log", 'w') { |file| file.write(results.to_json) }
       results
     end
 
