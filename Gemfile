@@ -7,7 +7,9 @@ gem 'sinatra', '~> 1.4.5'
 gem 'sinatra-contrib', '~> 1.4.2'
 gem 'rest-client'
 gem 'pg'
-gem 'ensnare_bnb', :path => 'ensnare_bnb' 
+gem 'ensnare_bnb', :path => 'ensnare_bnb'
+
+gem 'geocoder'
 
 # Testing
 gem 'pry-byebug'

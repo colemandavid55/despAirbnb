@@ -1,4 +1,6 @@
-module DespAirbnb 
+require_relative 'geo/geocalc'
+
+module DespAirbnb
   
   def self.build_dummy_rooms
     File.readlines(File.expand_path File.dirname(__FILE__) + "/dummyData/results.log").first
