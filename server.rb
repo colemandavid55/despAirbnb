@@ -27,7 +27,16 @@ class DespAirbnb::Server < Sinatra::Application
   ##########################################
   #  # event stream stuff.
   ##########################################
-  get '/hosts' do
+  get '/rooms' do
+    @start = params[:location]
+    @end = params[:destination]
+    @guests = params[:guests]
+    @range = params[:range]
+
+    puts @start
+    puts @end
+    puts @guests
+    puts @range
     # The following variables should be set
     # params[:start]
     # params[:end]

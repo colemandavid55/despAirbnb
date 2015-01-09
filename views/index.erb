@@ -1,12 +1,80 @@
 <html>
-<head>
-  <title>DespAirbnb!!!</title>
-</head>
-<body>
+	<head><title>despAirBnb</title>
+	<!-- 	<link type='text' href='/public/images/15-jpg.jpg'> -->
+		<style>
+		body {
+			background-color: #2F5D8A5;
+			background-image: url("images/15-jpg.jpg");
+		}
+		input {
+			width: 500px;
+			font-size: 40px;
+			border-radius: 5px;
+			border: 1px solid #A55C33;
+			box-shadow: 5px 5px 5px #888888;
+			font-family: Copperplate;
+		}
+		button {
+			height: 50px;
+			width: 200px;
+			/*box-shadow: 10px 5px #888888;*/
+			border-radius: 10px;
+			border: 2px solid #656565;
+			font-size: 30px;
+			cursor: hand;
 
-<div id="app">
-  <h4>Loading...</h4>
-</div>
+		}
+		h1 {
+			font-family: sans-serif;
+			color: #DAA038;
+		}
+		#map {
+			margin-top: 100px;
+			border: 5px solid black;
+			height: 1000px;
+			width: 1000px;
+			background-color: #959494;
+		}
+		select {
+			width: 150px;
+			font-size: 100px;
+		}
+		</style>
+	</head>
+	<body>
+		<center>
+		<h1>Welcome to despAir</h3>
+		<div id='route'> 
+			<form name='location' method='get' action='/rooms'>
+				<input type='text' name='location' placeholder='enter your location'></input><br><br>
+				<input type='text' name='destination' placeholder='enter your destination'></input><br><br>
+				<select name='guests'>
+					<option value='1'>1 guest</option>
+					<option value='2'>2 guests</option>
+					<option value='3'>3 guests</option>
+					<option value='4'>4 guests</option>
+					<option value='5'>5 guests</option>
+					<option value='6'>6 guests</option>
+					<option value='7'>7 guests</option>
+					<option value='8'>8 guests</option>
+					<option value='9'>9 guests</option>
+					<option value='10'>10 guests</option>
+				</select>
+				<select name='range'>
+					<option value='1'>Within 1 mile</option>
+					<option value='5'>Within 5 miles</option>
+					<option selected='selected' value='10'>Within 10 miles</option>
+					<option value='15'>Within 15 miles</option>
+					<option value='20'>Within 20 miles</option>
+					<option value='30'>Within 30 miles</option>
+				</select>
+				<br>
+				<br>
+				<button type='submit' value='submit'>Submit!</button>
+			</form>
 
-</body>
+		</div>
+		<div id='map'>
+		</div>
+	</center>
 </html>
