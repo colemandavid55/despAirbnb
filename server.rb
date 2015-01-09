@@ -36,17 +36,19 @@ class DespAirbnb::Server < Sinatra::Application
 
     puts @route
 
-    lastPoint = @route.first
+    prevPoint = @route.first
 
+    # filteredRoute = []
     filteredRoute = @route.slice(1,route.length).select do |point|
       if (DespAirbnb::Calculations.distance_between(lastPoint, point, {units: :mi}) > @range)
-        lastPoint = point
+        prevPoint = point
         true
       else
         false
       end
     end
 
+    # point = [LAT, LNG]
     routeAreas = filteredRoute.map do |point|
 
     end
