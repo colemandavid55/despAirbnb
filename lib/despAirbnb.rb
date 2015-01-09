@@ -10,7 +10,7 @@ module DespAirbnb
     rooms = JSON.parse(build_dummy_rooms)
     rooms.map do |room|  
       {
-        id: room['id'].to_i,
+        room_id: room['id'].to_i,
         latitude: room['latitude'],
         longitude: room['longitude']
       }
@@ -21,7 +21,7 @@ module DespAirbnb
     rooms = JSON.parse(build_dummy_rooms)
     idx = rooms.index { |r| r['id'].to_i == room_id } 
     {
-      id: rooms[idx]['id'].to_i,
+      room_id: rooms[idx]['id'].to_i,
       name: rooms[idx]['name'],
       price: rooms[idx]['price'],
       location: rooms[idx]['location'],
@@ -36,24 +36,24 @@ module DespAirbnb
   def self.get_rooms(rooms)
     rooms.map do |room|  
       {
-        id: room['id'].to_i,
-        latitude: room['latitude'],
-        longitude: room['longitude']
+        room_id: room[:id].to_i,
+        latitude: room[:latitude],
+        longitude: room[:longitude]
       }
     end
   end
 
   def self.get_room(rooms, room_id)
-    idx = rooms.index { |r| r['id'].to_i == room_id } 
+    idx = rooms.index { |r| r[:id].to_i == room_id } 
     {
-      id: rooms[idx]['id'].to_i,
-      name: rooms[idx]['name'],
-      price: rooms[idx]['price'],
-      location: rooms[idx]['location'],
-      latitude: rooms[idx]['latitude'],
-      longitude: rooms[idx]['longitude'],
-      roomUrl: rooms[idx]['roomUrl'],
-      imgUrl: rooms[idx]['imgUrl']
+      room_id: rooms[idx][:id].to_i,
+      name: rooms[idx][:name],
+      price: rooms[idx][:price],
+      location: rooms[idx][:location],
+      latitude: rooms[idx][:latitude],
+      longitude: rooms[idx][:longitude],
+      roomUrl: rooms[idx][:roomUrl],
+      imgUrl: rooms[idx][:imgUrl]
     }
 
   end

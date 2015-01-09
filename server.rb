@@ -2,6 +2,8 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'json'
 require 'pry-byebug'
+require 'ensnare_bnb'
+
 # require 'rack-flash'
 require_relative 'lib/despAirbnb.rb'
 
@@ -33,6 +35,10 @@ class DespAirbnb::Server < Sinatra::Application
   get '/rooms' do
     @route = params[:route] # <= Passed by Google Maps JS Frontend
     @range = params[:range]
+    @guests = params[:guests]
+
+    # @route = [ [30.250130000000002, -97.74995000000001], [31.12553, -97.33818000000001], [31.636650000000003, -97.09597000000001], [31.64316, -97.09656000000001], [32.40263, -96.87293000000001] ]
+    # @range = 10
 
     puts @route
 
@@ -40,7 +46,6 @@ class DespAirbnb::Server < Sinatra::Application
 
     # filteredRoute = []
     filteredRoute = @route.slice(1,@route.length).select do |point|
-      binding.pry
       if (DespAirbnb::Calculations.distance_between(prevPoint, point, {units: :mi}) > @range)
         prevPoint = point
         true
@@ -53,7 +58,8 @@ class DespAirbnb::Server < Sinatra::Application
 
     # point = [LAT, LNG]
     routeAreas = filteredRoute.map do |point|
-
+      point = DespAirbnb::Calculations.coord_float_to_string(point)
+      DespAirbnb::Calculations.python_baby(point, @range)
     end
 
     # routeAreas = [
@@ -64,24 +70,25 @@ class DespAirbnb::Server < Sinatra::Application
     @allRoomIds = {}
 
     routeAreas.each do |area|
+      area[SW] = DespAirbnb::Calculations.coord_float_to_string(area[SW])
+      area[NE] = DespAirbnb::Calculations.coord_float_to_string(area[NE])
       EnsnareBnb.find_airbnb_hosts(sw: area[SW], ne: area[NE]).each do |room|
-        if (!allRoomIds.has_key?(room[:id])) # Guearantee Unique
-          allRooms.push(room)
-          allRooms[room[:id]] = room[:id]
+        if (!@allRoomIds.has_key?(room[:id])) # Guearantee Unique
+          @allRooms.push(room)
+          @allRoomIds[room[:id]] = room[:id]
         end
       end
     end
 
-    # allRooms = [
+    # @allRooms = [
       # {
       #   lat: 
       #   lng:
       #   id:
       # }
     # ]
-    DespAirbnb.get_rooms(allRooms).to_json
 
-    
+    DespAirbnb.get_rooms(@allRooms).to_json
 
     # Do the Rest of our calculations here
     # √ 2. Break the map GPS Coords into an array of coords that are all x-miles apart (Backend - ?)
@@ -91,9 +98,9 @@ class DespAirbnb::Server < Sinatra::Application
     # √ 6. Pass filtered data to JS Frontend in @instance_variable as GPS Coordinates ()
   end
 
-  get '/rooms/:id' do
+  get '/rooms/:room_id' do
 
-    room_id = params[:id]
+    room_id = params[:room_id]
     DespAirbnb.get_room(@allRooms, room_id)
 
   end
