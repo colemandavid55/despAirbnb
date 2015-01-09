@@ -137,11 +137,12 @@ if __name__ == '__main__':
 
     import sys
     a = []
+    # "a" will be an array with a[0],a[1] being a starting coordinate (lat, lng), a[2] is range in miles
     temp = sys.stdin.readlines()
     for item in temp:
         a.append(float(item))
     loc = GeoLocation.from_degrees(a[0], a[1])
-    distance = 1  # 1 kilometer
+    distance = a[2]/.62137  # conversion from miles to kilometers
     SW_loc, NE_loc = loc.bounding_locations(distance)
     # print loc.distance_to(SW_loc)
     # print loc.distance_to(NE_loc)
