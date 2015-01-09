@@ -1,5 +1,4 @@
 require_relative 'geo/geocalc'
-require_relative 'geo/rubypython'
 
 module DespAirbnb
   
