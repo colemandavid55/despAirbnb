@@ -37,7 +37,7 @@ function calcRoute() {
   directionsService.route(request, function(response, status) {
     if (status == google.maps.DirectionsStatus.OK) {
       directionsDisplay.setDirections(response);
-      console.log(response.routes[0].overview_path[0].k + ", " + response.routes[0].overview_path[0].D)
+      console.log(response.routes[0].overview_path)
       dropPins(locations)
     }
   });
