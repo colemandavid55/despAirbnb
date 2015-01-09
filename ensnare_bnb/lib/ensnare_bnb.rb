@@ -1,3 +1,6 @@
+
+# EnsnareBnb.find_airbnb_hosts(city: 'Austin', state: 'TX', country: 'United-States', max_pages: 2)
+
 require_relative 'ensnare_bnb/version'
 require 'nokogiri'
 require 'json'
