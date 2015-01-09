@@ -1,4 +1,5 @@
 require 'geocoder'
+require 'pry-byebug'
 
 module DespAirbnb
   module Calculations
@@ -24,27 +25,46 @@ module DespAirbnb
       Geocoder::Calculations.distance_between(point1, point2, options)
     end
 
+    def coord_float_to_string(coord) 
+      coord.map! { |point| point.to_s }
+    end
+
     def python_baby(coord, range)
 
-      pythonPortal = IO.popen("python python_function.py", "w+")
+      path = File.expand_path File.dirname(__FILE__) + "/python_function.py"
+
+      pythonPortal = IO.popen("python #{path}", "w+")
       pythonPortal.puts coord, range
       pythonPortal.close_write
       result = []
+
       temp = pythonPortal.gets
 
-      while temp!= nil
-          result<<temp
+      while temp != nil
+          result << temp
           temp = pythonPortal.gets
       end 
+
+      # gotValue = false
+
+      # binding.pry
+
+      # begin
+      #   if( temp = pythonPortal.gets )
+      #     result << temp
+      #     gotValue = true
+      #   end
+      # end while (temp == nil || !gotValue)
+
 
       corner1 = [] 
       corner2 = []
 
 
-      corner1 << result[0].gsub(/[()]/, "").split("=")[0].split(",")[0].gsub(/[deg]/, "").to_f
-      corner1 << result[0].gsub(/[()]/, "").split("=")[0].split(",")[1].strip.gsub(/[deg]/, "").to_f
-      corner2 << result[1].gsub(/[()]/, "").split("=")[0].split(",")[0].gsub(/[deg]/, "").to_f
-      corner2 << result[1].gsub(/[()]/, "").split("=")[0].split(",")[1].gsub(/[deg]/, "").to_f
+      corner1 << result[0].gsub(/[()]/, "").split("=")[0].split(",")[0].strip.gsub(/[deg]/, "")
+      corner1 << result[0].gsub(/[()]/, "").split("=")[0].split(",")[1].strip.gsub(/[deg]/, "")
+      corner2 << result[1].gsub(/[()]/, "").split("=")[0].split(",")[0].strip.gsub(/[deg]/, "")
+      corner2 << result[1].gsub(/[()]/, "").split("=")[0].split(",")[1].strip.gsub(/[deg]/, "")
 
       box = []
       box << corner1
