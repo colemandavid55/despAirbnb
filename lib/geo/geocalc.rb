@@ -24,11 +24,10 @@ module DespAirbnb
       Geocoder::Calculations.distance_between(point1, point2, options)
     end
 
-    def python_baby(coord)
-      coord = ["26.062951", "-80.238853"]
+    def python_baby(coord, range)
 
       pythonPortal = IO.popen("python python_function.py", "w+")
-      pythonPortal.puts coord
+      pythonPortal.puts coord, range
       pythonPortal.close_write
       result = []
       temp = pythonPortal.gets
