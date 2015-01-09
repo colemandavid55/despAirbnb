@@ -27,7 +27,7 @@ module DespAirbnb
     def python_baby(coord, range)
 
       pythonPortal = IO.popen("python python_function.py", "w+")
-      pythonPortal.puts coord
+      pythonPortal.puts coord, range
       pythonPortal.close_write
       result = []
       temp = pythonPortal.gets
