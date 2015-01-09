@@ -1,6 +1,6 @@
 
 task :environment do
-  require './lib/petshop.rb'
+  require './lib/despAirbnb.rb'
 end
 
 task :console => :environment do
