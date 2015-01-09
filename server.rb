@@ -48,7 +48,7 @@ class DespAirbnb::Server < Sinatra::Application
     end
 
     routeAreas = filteredRoute.map do |point|
-
+      DespAirbnb::Calculations.python_baby(point)
     end
 
     # routeAreas = [
