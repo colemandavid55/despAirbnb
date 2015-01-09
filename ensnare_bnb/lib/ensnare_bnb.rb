@@ -22,12 +22,6 @@ module EnsnareBnb
 
     def find_airbnb_hosts(**opts)
 
-      DEFAULT_RANGE = 10
-      DEFAULT_SLEEP = 0
-
-      LAT = 0
-      LNG = 1
-
       # city, state, country
       # New-York--NY--United-States
 
@@ -40,24 +34,22 @@ module EnsnareBnb
       country = opts.fetch(:country, nil)
       sw_coords = opts.fetch(:sw, nil)
       ne_coords = opts.fetch(:ne, nil)
-      range = opts.feth(:range, DEFAULT_RANGE)
-      sleep_time = opts.fetch(:sleep, DEFAULT_SLEEP)
+      range = opts.fetch(:range, 10)
+      sleep_time = opts.fetch(:sleep, 0)
 
       # build intelligent options hashes/params in URLparams
-
       base_url = "https://www.airbnb.com"
 
-      city_query = "", coord_query = ""
+      city_query = ""
+      coord_query = ""
 
-      if ( :city )
+      if( sw_coords && ne_coords )
+        coord_query = "&sw_lat=" + sw_coords[0] + "&sw_lng=" + sw_coords[1] +
+                      "&ne_lat=" + ne_coords[0] + "&ne_lng=" + ne_coords[1]
+      elsif ( city )
         city_query = [city, state, country].compact.map do |str|
           str.gsub('-', '~').gsub(' ', '-')
         end.join('--')
-
-      elsif( :sw && :ne)
-
-        coord_query = "&sw_lat=" + sw_coords[LAT] + "&sw_lng=" + sw_coords[LNG] +
-                      "&ne_lat=" + ne_coords[LAT] + "&ne_lng=" + ne_coords[LNG]
       end
 
       search_params = opts.except(:city, :state, :country, :max_pages, :sw, :ne)
@@ -72,22 +64,34 @@ module EnsnareBnb
         url = "#{search_url}?room_types%5B%5D=Entire+home%2Fapt&page=#{pg}"
         Nokogiri::HTML(open(url)).css(".col-sm-12.col-md-6.row-space-2").each do |room|
 
-          name   = room.css('.listing').first['data-name']
-          lat    = room.css('.listing').first['data-lat']
-          lng    = room.css('.listing').first['data-lng']
-          url    = base_url + room.css('.listing').first['data-url']
-          price  = room.css('.price-amount').first.text
-          img    = room.css('img').first['src']
+          id       = room.css('.listing').first['data-id']
+          location = room.css('.listing-location').first.text.match(/ ([^·\n]*)\s+$/)[1]
+          name     = room.css('.listing').first['data-name']
+          lat      = room.css('.listing').first['data-lat']
+          lng      = room.css('.listing').first['data-lng']
+          url      = base_url + room.css('.listing').first['data-url']
+          price    = room.css('.price-amount').first.text
+          img      = room.css(".listing-img-container > img").first['src']
+
+          # If default image was not found, use alternate images
+          if (img.match(/no_photos/))
+            img      = JSON.parse(room.css(".listing-img-container > img").first['data-urls']).first
+          end
 
           output = {
-            city: city,
+            id:   id,
+            location: location,
             name: name,
             price: price.to_i,
             lattitude: lat,
             longitude: lng,
-            roomUrlExt: urlExt,
+            roomUrl: url,
             imgUrl: img
           }
+
+          if (img.match(/no_photos/))
+            binding.pry
+          end
 
           results << output
         end
