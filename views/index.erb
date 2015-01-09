@@ -28,7 +28,7 @@
 			font-family: sans-serif;
 			color: #DAA038;
 		}
-		#map {
+		#map-canvas {
 			margin-top: 100px;
 			border: 5px solid black;
 			height: 1000px;
@@ -37,9 +37,15 @@
 		}
 		select {
 			width: 150px;
-			font-size: 100px;
+			font-size: 30px;
 		}
 		</style>
+		<script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHXOgZv7Yea-WhQ2sgUr-Cs-IKGYIm30c">
+    </script>
+    <script type="text/javascript"
+      src="javascript/google_functions.js">
+    </script>
 	</head>
 	<body>
 		<center>
@@ -74,7 +80,7 @@
 			</form>
 
 		</div>
-		<div id='map'>
+		<div id='map-canvas'>
 		</div>
 	</center>
 </html>
