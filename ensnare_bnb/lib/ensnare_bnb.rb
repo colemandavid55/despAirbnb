@@ -10,6 +10,12 @@ module EnsnareBnb
 
   class << self
 
+    DEFAULT_SLEEP = 0
+    DFAULT_RANGE = 10
+
+    LAT = 0
+    LNG = 1
+
     def max_page_number(url)
       # pagination-buttons-container
       selector = "body > div.map-search > div.sidebar > " +
@@ -34,8 +40,8 @@ module EnsnareBnb
       country = opts.fetch(:country, nil)
       sw_coords = opts.fetch(:sw, nil)
       ne_coords = opts.fetch(:ne, nil)
-      range = opts.fetch(:range, 10)
-      sleep_time = opts.fetch(:sleep, 0)
+      range = opts.fetch(:range, DFAULT_RANGE)
+      sleep_time = opts.fetch(:sleep, DEFAULT_SLEEP)
 
       # build intelligent options hashes/params in URLparams
       base_url = "https://www.airbnb.com"
@@ -44,8 +50,8 @@ module EnsnareBnb
       coord_query = ""
 
       if( sw_coords && ne_coords )
-        coord_query = "&sw_lat=" + sw_coords[0] + "&sw_lng=" + sw_coords[1] +
-                      "&ne_lat=" + ne_coords[0] + "&ne_lng=" + ne_coords[1]
+        coord_query = "&sw_lat=" + sw_coords[LAT] + "&sw_lng=" + sw_coords[LNG] +
+                      "&ne_lat=" + ne_coords[LAT] + "&ne_lng=" + ne_coords[LNG]
       elsif ( city )
         city_query = [city, state, country].compact.map do |str|
           str.gsub('-', '~').gsub(' ', '-')
@@ -60,9 +66,27 @@ module EnsnareBnb
       pages = opts.fetch(:max_pages, self.max_page_number(search_url))
       results = []
 
+      logger = Logger.new('logfile.log')
+
+      logger.info("Start")
+
       pages.times do |pg|
+
+        logger.info("Page #{pg}")
+
         url = "#{search_url}?room_types%5B%5D=Entire+home%2Fapt&page=#{pg}"
-        Nokogiri::HTML(open(url)).css(".col-sm-12.col-md-6.row-space-2").each do |room|
+
+        # selector = "div.col-sm-12.col-md-6.row-space-2"
+
+        # selector = "body > div.map-search > div.sidebar > " +
+        #           "div.search-results > div.outer-listings-container > " +
+        #           "div.listings-container > div.col-sm-12.col-md-6.row-space-2"
+
+        selector = "body > div.map-search > div.sidebar > div.search-results > div.outer-listings-container.row-space-5.row-space-2-sm > div > div"
+
+        Nokogiri::HTML(open(url)).css(selector).each do |room|
+
+          logger.info("Page #{pg} - Got Location")
 
           id       = room.css('.listing').first['data-id']
           location = room.css('.listing-location').first.text.match(/ ([^·\n]*)\s+$/)[1]
@@ -98,6 +122,8 @@ module EnsnareBnb
         # prevent bombarding the server with too many requests at once (default=>1)
         sleep(sleep_time)
       end
+      logger.info("Stop")
+      logger.close()
       results
     end
 
