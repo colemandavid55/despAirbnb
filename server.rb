@@ -50,7 +50,7 @@ class DespAirbnb::Server < Sinatra::Application
 
     # point = [LAT, LNG]
     routeAreas = filteredRoute.map do |point|
-
+      DespAirbnb::Calculations.python_baby(point)
     end
 
     # routeAreas = [
