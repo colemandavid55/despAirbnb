@@ -39,8 +39,9 @@ class DespAirbnb::Server < Sinatra::Application
     prevPoint = @route.first
 
     # filteredRoute = []
-    filteredRoute = @route.slice(1,route.length).select do |point|
-      if (DespAirbnb::Calculations.distance_between(lastPoint, point, {units: :mi}) > @range)
+    filteredRoute = @route.slice(1,@route.length).select do |point|
+      binding.pry
+      if (DespAirbnb::Calculations.distance_between(prevPoint, point, {units: :mi}) > @range)
         prevPoint = point
         true
       else
@@ -48,17 +49,19 @@ class DespAirbnb::Server < Sinatra::Application
       end
     end
 
+    filteredRoute.unshift(@route.first)
+
     # point = [LAT, LNG]
     routeAreas = filteredRoute.map do |point|
-      DespAirbnb::Calculations.python_baby(point)
+
     end
 
     # routeAreas = [
     #   [SW,NE]
     # ]
 
-    allRooms = []
-    allRoomIds = {}
+    @allRooms = []
+    @allRoomIds = {}
 
     routeAreas.each do |area|
       EnsnareBnb.find_airbnb_hosts(sw: area[SW], ne: area[NE]).each do |room|
@@ -76,7 +79,7 @@ class DespAirbnb::Server < Sinatra::Application
       #   id:
       # }
     # ]
-    DespAirbnb.get_rooms(allRooms)
+    DespAirbnb.get_rooms(allRooms).to_json
 
     
 
@@ -89,6 +92,9 @@ class DespAirbnb::Server < Sinatra::Application
   end
 
   get '/rooms/:id' do
+
+    room_id = params[:id]
+    DespAirbnb.get_room(@allRooms, room_id)
 
   end
 
