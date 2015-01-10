@@ -80,8 +80,8 @@ function dropPins(mylocations) {
   //locations is an array
   for (var i=0; i < mylocations.length; i++){
     console.log(mylocations[i]["room_id"])
-    $.get('/rooms/' + mylocations[i]["room_id"],
-      function(data,status){
+    $.get('/rooms/' + mylocations[i]["room_id"])
+      .done(function(data,status){
        var curr = JSON.parse(data)
   
     var mycontent = '<div id="'+curr.room_id+'">'+
@@ -98,7 +98,7 @@ function dropPins(mylocations) {
     var mypreview = '<p><a href="'+curr.roomUrl+'"><b>'+curr.name+'</b></a></p>';
 
     var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(parseFloat(curr.lattitude), parseFloat(curr.longitude)),
+        position: new google.maps.LatLng(parseFloat(curr.latitude), parseFloat(curr.longitude)),
         map: map,
         title: curr.location,
         html: mycontent,
@@ -114,7 +114,7 @@ function dropPins(mylocations) {
       infowindow.setContent(this.prev)
       infowindow.open(map, this);
     });
-  })
+  });
 
   }
 
