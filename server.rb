@@ -24,6 +24,10 @@ class DespAirbnb::Server < Sinatra::Application
     erb :index
   end
 
+  get '/dummy' do
+    return DespAirbnb.build_dummy_rooms
+  end
+
   ##########################################
   #  # event stream stuff.
   ##########################################
