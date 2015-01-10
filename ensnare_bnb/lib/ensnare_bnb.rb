@@ -1,3 +1,6 @@
+
+# EnsnareBnb.find_airbnb_hosts(city: 'Austin', state: 'TX', country: 'United-States', max_pages: 2)
+
 require_relative 'ensnare_bnb/version'
 require 'nokogiri'
 require 'json'
@@ -57,7 +60,14 @@ module EnsnareBnb
 
       search_url = "#{base_url}/s/#{query}"
 
+     
+
       pages = opts.fetch(:max_pages, self.max_page_number(search_url))
+
+      if (pages == 0) 
+        pages = 1
+      end
+
       results = []
 
       pages.times do |pg|

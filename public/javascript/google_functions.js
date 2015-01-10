@@ -41,16 +41,18 @@ function calcRoute(num_guests, mi_range) {
       var mypath = response.routes[0].overview_path;
       var submitpath = [];
       for (var x=0; x < mypath.length; x++){
-        submitpath.push([mypath.k, mypath.D]);
+        submitpath.push([mypath[x].k, mypath[x].D]);
       }
+      console.log(submitpath)
+      console.log(num_guests)
+      console.log(mi_range)
 
       $.post("/rooms",
       {
-        route: submitpath,
+        route: JSON.stringify(submitpath),
         guests: num_guests,
         range: mi_range
-      },
-      function(data,status){
+      }).done(function(data){
         locations = jQuery.parseJSON("" + data);
         dropPins(locations)
       });
@@ -77,24 +79,28 @@ function codeAddress(address) {
 function dropPins(mylocations) {
   //locations is an array
   for (var i=0; i < mylocations.length; i++){
+    console.log(mylocations[i]["room_id"])
+    $.get('/rooms/' + mylocations[i]["room_id"],
+      function(data,status){
+       var curr = JSON.parse(data)
   
-    var mycontent = '<div id="'+mylocations[i].id+'">'+
+    var mycontent = '<div id="'+curr.room_id+'">'+
         '<div id="siteNotice">'+
         '</div>'+
-        '<h1 id="firstHeading" class="firstHeading">'+mylocations[i].location+'</h1>'+
+        '<h1 id="firstHeading" class="firstHeading">'+curr.location+'</h1>'+
         '<div id="bodyContent">'+
-        '<p><a href="'+mylocations[i].roomUrl+'"><b>'+mylocations[i].name+'</b></a></p>'+
-        '<p>Price: $'+mylocations[i].price+'</p>'+
-        '<p><img src='+mylocations[i].imgUrl+'></img></p>'+
+        '<p><a href="'+curr.roomUrl+'"><b>'+curr.name+'</b></a></p>'+
+        '<p>Price: $'+curr.price+'</p>'+
+        '<p><img src='+curr.imgUrl+'></img></p>'+
         '</div>'+
         '</div>';
 
-    var mypreview = '<p><a href="'+mylocations[i].roomUrl+'"><b>'+mylocations[i].name+'</b></a></p>';
+    var mypreview = '<p><a href="'+curr.roomUrl+'"><b>'+curr.name+'</b></a></p>';
 
     var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(parseFloat(mylocations[i].lattitude), parseFloat(mylocations[i].longitude)),
+        position: new google.maps.LatLng(parseFloat(curr.lattitude), parseFloat(curr.longitude)),
         map: map,
-        title: mylocations[i].location,
+        title: curr.location,
         html: mycontent,
         prev: mypreview
     });
@@ -108,9 +114,9 @@ function dropPins(mylocations) {
       infowindow.setContent(this.prev)
       infowindow.open(map, this);
     });
-  }
+  })
 
-  
+  }
 
 }
 

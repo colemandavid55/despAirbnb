@@ -2,12 +2,19 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'json'
 require 'pry-byebug'
+require 'ensnare_bnb'
+
 # require 'rack-flash'
 require_relative 'lib/despAirbnb.rb'
 
 class DespAirbnb::Server < Sinatra::Application
 
   set :bind, '0.0.0.0' # This is needed for Vagrant
+
+  SW = 0
+  NE = 1
+
+  @@allRooms = []
 
   configure do
     enable :sessions
@@ -31,30 +38,81 @@ class DespAirbnb::Server < Sinatra::Application
   ##########################################
   #  # event stream stuff.
   ##########################################
-  get '/rooms' do
-    @start = params[:location]
-    @end = params[:destination]
-    @guests = params[:guests]
-    @range = params[:range]
+  post '/rooms' do
+    @route = JSON.parse(params[:route]).to_a # <= Passed by Google Maps JS Frontend
+    @range = params[:range].to_i
+    @guests = params[:guests].to_i
 
-    puts @start
-    puts @end
-    puts @guests
-    puts @range
-    # The following variables should be set
-    # params[:start]
-    # params[:end]
+    # @route = [ [30.250130000000002, -97.74995000000001], [31.12553, -97.33818000000001], [31.636650000000003, -97.09597000000001], [31.64316, -97.09656000000001], [32.40263, -96.87293000000001] ]
+    # @range = 10
+
+    #puts @route
+
+    prevPoint = @route.first
+
+    # filteredRoute = []
+    filteredRoute = @route.slice(1,@route.length).select do |point|
+      if (DespAirbnb::Calculations.distance_between(prevPoint, point, {units: :mi}) > @range)
+        prevPoint = point
+        true
+      else
+        false
+      end
+    end
+
+    puts filteredRoute
+    filteredRoute.unshift(@route.first)
+
+    # point = [LAT, LNG]
+    routeAreas = filteredRoute.map do |point|
+      point = DespAirbnb::Calculations.coord_float_to_string(point)
+      DespAirbnb::Calculations.python_baby(point, @range)
+    end
+
+    # routeAreas = [
+    #   [SW,NE]
+    # ]
+
+    @allRoomIds = {}
+
+    puts "Number of routeArea: #{routeAreas.length}"
+    counter = 1
+    routeAreas.each do |area|
+      puts (counter = counter + 1)
+      area[SW] = DespAirbnb::Calculations.coord_float_to_string(area[SW])
+      area[NE] = DespAirbnb::Calculations.coord_float_to_string(area[NE])
+      EnsnareBnb.find_airbnb_hosts(sw: area[SW], ne: area[NE]).each do |room|
+        if (!@allRoomIds.has_key?(room[:id])) # Guearantee Unique
+          @@allRooms.push(room)
+          @allRoomIds[room[:id]] = room[:id]
+        end
+      end
+    end
+
+    # @allRooms = [
+      # {
+      #   lat: 
+      #   lng:
+      #   id:
+      # }
+    # ]
+    #puts "got here"
+    #puts @@allRooms
+    DespAirbnb.get_rooms(@@allRooms).to_json
 
     # Do the Rest of our calculations here
-    # 1. Query Google to Create a Map Without Hosts
-    # 2. Break the map GPS Coords into an array of coords that are all x-miles apart
-    # 3. Create a south-east and north-west coord array given the above coord list
-    # 4. Query Ensnare_bnb for each one of the sw / nw coord sets
-    # 5. Filter all data such that it's at least x-miles from coord, and data 'id' is unique (This creates a hash)
-    # 6. Add filtered data to map as GPS Coordinates
-    # 7. return new map so we can display it on the front end, else return status error
-    
-    erb :index
+    # √ 2. Break the map GPS Coords into an array of coords that are all x-miles apart (Backend - ?)
+    # 3. Create a south-east and north-west coord array given the above coord list (Backend - David)
+    # √ 4. Query Ensnare_bnb for each one of the sw / nw coord sets ( Backend - Alex & James )
+    # √ 5. Filter all data such that data 'id' is unique (This creates a hash)
+    # √ 6. Pass filtered data to JS Frontend in @instance_variable as GPS Coordinates ()
+  end
+
+  get '/rooms/:room_id' do
+
+    room_id = params[:room_id]
+    DespAirbnb.get_room(@@allRooms, room_id).to_json
+
   end
 
 end
