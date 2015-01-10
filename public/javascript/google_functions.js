@@ -1,20 +1,19 @@
 var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
 var map;
-var austin = new google.maps.LatLng(30.25, -97.75);
-var dallas = new google.maps.LatLng(32.7758, -96.7967);
-var waco = new google.maps.LatLng(31.5514, -97.1558);
-var temple = new google.maps.LatLng(31.0936, -97.3622);
-var locations = [waco,temple]
+var geocoder;
+var grand_canyon = new google.maps.LatLng(36.1000, -112.1000);
+var locations;
 var infowindow = null;
 var contentString = [];
 
+
 function initialize() {
   directionsDisplay = new google.maps.DirectionsRenderer();
-  calcRoute();
+  //calcRoute();
   var mapOptions = {
-    center: austin,
-    zoom: 9
+    center: grand_canyon,
+    zoom: 8
   };
   map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   directionsDisplay.setMap(map);
@@ -22,23 +21,55 @@ function initialize() {
   infowindow = new google.maps.InfoWindow({
         content: "holding..."
   });
+
+  /*$.get("/dummy",function(data,status){
+    locations = jQuery.parseJSON("" + data);
+    dropPins(locations)
+  });*/
 }
 
-function calcRoute() {
-  var selectedMode = "DRIVING" //document.getElementById("mode").value;
+function calcRoute(num_guests, mi_range) {
+  var selectedMode = "DRIVING" 
   var request = {
-      origin: austin,
-      destination: dallas,
-      // Note that Javascript allows us to access the constant
-      // using square brackets and a string value as its
-      // "property."
+      origin: $( "input[name='location']" ).val(),
+      destination: $( "input[name='destination']" ).val(),
       travelMode: google.maps.TravelMode[selectedMode]
   };
   directionsService.route(request, function(response, status) {
     if (status == google.maps.DirectionsStatus.OK) {
       directionsDisplay.setDirections(response);
-      console.log(response.routes[0].overview_path)
-      dropPins(locations)
+      var mypath = response.routes[0].overview_path;
+      var submitpath = [];
+      for (var x=0; x < mypath.length; x++){
+        submitpath.push([mypath.k, mypath.D]);
+      }
+
+      $.post("/rooms",
+      {
+        route: submitpath,
+        guests: num_guests,
+        range: mi_range
+      },
+      function(data,status){
+        locations = jQuery.parseJSON("" + data);
+        dropPins(locations)
+      });
+    }
+
+  });
+}
+
+
+function codeAddress(address) {
+  geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      map.setCenter(results[0].geometry.location);
+      var marker = new google.maps.Marker({
+          map: map,
+          position: results[0].geometry.location
+      });
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
     }
   });
 }
@@ -47,24 +78,23 @@ function dropPins(mylocations) {
   //locations is an array
   for (var i=0; i < mylocations.length; i++){
   
-    var mycontent = '<div id="content'+i+'">'+
+    var mycontent = '<div id="'+mylocations[i].id+'">'+
         '<div id="siteNotice">'+
         '</div>'+
-        '<h1 id="firstHeading" class="firstHeading">Location'+i+' Name Here</h1>'+
+        '<h1 id="firstHeading" class="firstHeading">'+mylocations[i].location+'</h1>'+
         '<div id="bodyContent">'+
-        '<p><b>Location</b></p>'+
-        '<p>Miles from Path?</p>'+
-        '<p>Address</p>'+
+        '<p><a href="'+mylocations[i].roomUrl+'"><b>'+mylocations[i].name+'</b></a></p>'+
+        '<p>Price: $'+mylocations[i].price+'</p>'+
+        '<p><img src='+mylocations[i].imgUrl+'></img></p>'+
         '</div>'+
         '</div>';
 
-    var mypreview = '<p><b>Preview?</b></p>'
+    var mypreview = '<p><a href="'+mylocations[i].roomUrl+'"><b>'+mylocations[i].name+'</b></a></p>';
 
-  
     var marker = new google.maps.Marker({
-        position: mylocations[i],
+        position: new google.maps.LatLng(parseFloat(mylocations[i].lattitude), parseFloat(mylocations[i].longitude)),
         map: map,
-        title: 'Location',
+        title: mylocations[i].location,
         html: mycontent,
         prev: mypreview
     });
@@ -85,3 +115,10 @@ function dropPins(mylocations) {
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
+$(document).on('click', $("button"), function(e){
+  e.preventDefault();
+  var num_guests = $( "select[name='guests']" ).val();
+  var mile_range = $( "select[name='range']" ).val();
+  calcRoute(num_guests, mile_range);
+});
