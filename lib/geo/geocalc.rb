@@ -45,17 +45,6 @@ module DespAirbnb
           temp = pythonPortal.gets
       end 
 
-      # gotValue = false
-
-      # binding.pry
-
-      # begin
-      #   if( temp = pythonPortal.gets )
-      #     result << temp
-      #     gotValue = true
-      #   end
-      # end while (temp == nil || !gotValue)
-
 
       corner1 = [] 
       corner2 = []
