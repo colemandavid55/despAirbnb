@@ -59,7 +59,7 @@ class DespAirbnb::Server < Sinatra::Application
     # point = [LAT, LNG]
     routeAreas = filteredRoute.map do |point|
       point = DespAirbnb::Calculations.coord_float_to_string(point)
-      DespAirbnb::Calculations.python_baby(point, @range)
+      DespAirbnb::Calculations.get_SW_NE_coordinates(point, @range)
     end
 
     # routeAreas = [

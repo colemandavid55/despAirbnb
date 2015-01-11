@@ -29,7 +29,7 @@ module DespAirbnb
       coord.map! { |point| point.to_s }
     end
 
-    def python_baby(coord, range)
+    def get_SW_NE_coordinates(coord, range)
 
       path = File.expand_path File.dirname(__FILE__) + "/python_function.py"
 
