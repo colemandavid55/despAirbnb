@@ -15,6 +15,9 @@ function initialize() {
     center: grand_canyon,
     zoom: 8
   };
+  /* Delete previous map here */
+  // document.getElementById("map-canvas").empty();
+  $('#map-canvas').empty();
   map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   directionsDisplay.setMap(map);
 
@@ -55,6 +58,7 @@ function calcRoute(num_guests, mi_range) {
       }).done(function(data){
         locations = jQuery.parseJSON("" + data);
         dropPins(locations)
+        $('button').prop("disabled", false); //re-enable search button after pins are dropped for new searches.
       });
     }
 
@@ -146,19 +150,13 @@ function dropPins(rooms) {
 google.maps.event.addDomListener(window, 'load', initialize);
 
 
-// $(document).on('click', 'button', function () {
-//      $('#map-canvas').css( { height: $(window).innerHeight()});
-//      google.maps.event.trigger(map, 'resize');
-//      $(this).prop("disabled", true);
-//     });
-
 function genRooms() {
   var num_guests = $( "select[name='guests']" ).val();
   var mile_range = $( "select[name='range']" ).val();
-  $('#map-canvas').css( { height: $(window).innerHeight()});
-     google.maps.event.trigger(map, 'resize');
-  $('button').prop("disabled", true);
+  $('#map-canvas').css( { height: $(window).innerHeight()}); // adjust the map div to fit the window after search.
+  google.maps.event.trigger(window, 'load', initialize); // reload the map to get rid of the old query.
+  google.maps.event.trigger(map, 'resize'); // fit the actual map into the resized div
+  $('button').prop("disabled", true); //disable the search button to prevent multiple queries
   calcRoute(num_guests, mile_range);
-  $('button').prop("disabled", false);
 }
 
