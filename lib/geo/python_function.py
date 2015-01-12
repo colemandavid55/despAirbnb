@@ -123,11 +123,11 @@ class GeoLocation:
             
 if __name__ == '__main__':
     # receive data(coordinate and range) from ruby method within geocalc.rb and returns an array of bounding box coordinates
-
     import sys
+    # This module provides a number of functions and variables that can be used to manipulate different parts of the Python runtime environment.
     a = []
     # "a" will be an array with a[0],a[1] being a starting coordinate (lat, lng), a[2] is range in miles
-    temp = sys.stdin.readlines()
+    temp = sys.stdin.readlines() # Call readline() repeatedly and return a list of the lines so read.
     for item in temp:
         a.append(float(item))
     loc = GeoLocation.from_degrees(a[0], a[1])
