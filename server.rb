@@ -60,7 +60,7 @@ class DespAirbnb::Server < Sinatra::Application
       end
     end
 
-    puts filteredRoute
+    # puts filteredRoute
     filteredRoute.unshift(@route.first)
 
     # point = [LAT, LNG]
@@ -75,16 +75,25 @@ class DespAirbnb::Server < Sinatra::Application
 
     @allRoomIds = {}
 
-    puts "Number of routeArea: #{routeAreas.length}"
+    puts "Number of routeAreas: #{routeAreas.length}"
     counter = 1
     routeAreas.each do |area|
-      puts (counter = counter + 1)
+      puts "Calulcating routeArea #{counter} . . ."
+      counter+=1
       area[SW] = DespAirbnb::Calculations.coord_float_to_string(area[SW])
       area[NE] = DespAirbnb::Calculations.coord_float_to_string(area[NE])
       EnsnareBnb.find_airbnb_hosts(sw: area[SW], ne: area[NE]).each do |room|
         if (!@allRoomIds.has_key?(room[:id])) # Guearantee Unique
-          @@allRooms.push(room)
-          @allRoomIds[room[:id]] = room[:id]
+          # Check that it falls in the correct range . . .
+          lat_upper_bound = area[NE][0].to_f
+          lat_lower_bound = area[SW][0].to_f
+          lng_upper_bound = area[NE][1].to_f
+          lng_lower_bound = area[SW][1].to_f
+          if (lat_upper_bound >= room[:latitude].to_f &&  lat_lower_bound <= room[:latitude].to_f &&
+              lng_upper_bound >= room[:longitude].to_f && lng_lower_bound <= room[:longitude].to_f)
+            @@allRooms.push(room)
+            @allRoomIds[room[:id]] = room[:id]
+          end 
         end
       end
     end
