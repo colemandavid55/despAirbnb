@@ -10,15 +10,7 @@
     <script type="text/javascript"
 	    src="javascript/google_functions.js">
 	  </script>
-	  <script>
-	  $(document).on('click', 'button', function () {
-	  	$('#map-canvas').css( { height: $(window).innerHeight()});
-	  	google.maps.event.trigger(map, 'resize');
-	  	// alert("click");
-	  });
-	  </script>
-
-	<!-- 	<link type='text' href='/public/images/15-jpg.jpg'> -->
+	  
 		<style>
 		body {
 			background-color: #2F5D8A5;
@@ -52,7 +44,7 @@
 			/*height: 500px;
 			width: 500px;*/
 			position: absolute;
-            top: 220; right: 200; bottom: 0; left: 200;
+            top: 250; right: 200; bottom: 0; left: 200;
 			background-color: #959494;
 		}
 		select {
@@ -94,13 +86,14 @@
 				</select>
 				<br>
 				<br>
+				<a href='#map-canvas'>
+					<div>
+						<button type="button" onclick="genRooms()">Search</button>
+					</div>
+				</a>
+				<br>
 			</form>
-			<a href='#map-canvas'>
-				<div>
-					<button type="button" onclick="genRooms()">Search</button>
-				</div>
-			</a>
-
+			
 		</div>
 		<div id='map-canvas'>
 		</div>
