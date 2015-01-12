@@ -119,7 +119,7 @@ class DespAirbnb::Server < Sinatra::Application
 
   get '/rooms/:room_id' do
 
-    room_id = params[:room_id]
+    room_id = params[:room_id].to_i
     DespAirbnb.get_room(@@allRooms, room_id).to_json
 
   end
