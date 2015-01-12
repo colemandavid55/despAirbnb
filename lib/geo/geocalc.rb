@@ -47,7 +47,7 @@ module DespAirbnb
           temp = pythonPortal.gets
       end 
 
-
+      #result[0]/result[1] will be of form: "(26.0196deg, -80.2871deg) = (0.454127rad, -1.401275rad)\n"
       corner1 = [] 
       corner2 = []
 
@@ -60,6 +60,7 @@ module DespAirbnb
       box = []
       box << corner1
       box << corner2
+      # box will be in form: [["26.0196", "-80.2871"], ["26.1063", "-80.1906"]]
 
       box
     end
