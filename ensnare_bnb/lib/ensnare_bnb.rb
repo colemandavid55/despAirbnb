@@ -13,14 +13,20 @@ module EnsnareBnb
 
   class << self
 
+    MAX_PAGES = 100
+
     def max_page_number(url)
       # pagination-buttons-container
       selector = "body > div.map-search > div.sidebar > " +
                   "div.search-results > div.results-footer > " +
-                  "div.pagination-buttons-container > div.pagination > ul > " +
-                  "li:nth-child(5)"
+                  "div.pagination-buttons-container > div.pagination > ul > li"
 
-      Nokogiri::HTML(open(url)).css(selector).text.to_i
+      li_list = Nokogiri::HTML(open(url)).css(selector)
+      if (li_list.length < 2)
+        li_list.length + 1
+      else
+        li_list[li_list.length - 2].text.to_i
+      end
     end
 
     def find_airbnb_hosts(**opts)
@@ -60,11 +66,21 @@ module EnsnareBnb
 
       search_url = "#{base_url}/s/#{query}"
 
-      pages = opts.fetch(:max_pages, self.max_page_number(search_url))
+     
+      pages = self.max_page_number(search_url)
+
+
+      if (pages == 0) 
+        pages = 1
+      elsif (pages > opts.fetch(:max_pages, MAX_PAGES))
+        pages = opts.fetch(:max_pages, MAX_PAGES)
+      end
+
       results = []
 
       pages.times do |pg|
-        url = "#{search_url}?room_types%5B%5D=Entire+home%2Fapt&page=#{pg}"
+        url = "#{search_url}?room_types%5B%5D=Entire+home%2Fapt&page=#{pg + 1}"
+
         Nokogiri::HTML(open(url)).css(".col-sm-12.col-md-6.row-space-2").each do |room|
 
           id       = room.css('.listing').first['data-id']
