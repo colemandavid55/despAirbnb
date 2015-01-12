@@ -33,12 +33,14 @@ module DespAirbnb
 
       path = File.expand_path File.dirname(__FILE__) + "/python_function.py"
 
+      #IO.popen: 1st arg is exactly what you would type into the command line to execute your python script.
+
       pythonPortal = IO.popen("python #{path}", "w+")
-      pythonPortal.puts coord, range
+      pythonPortal.puts coord, range # anything you puts will be available to your python script from stdin
       pythonPortal.close_write
       result = []
 
-      temp = pythonPortal.gets
+      temp = pythonPortal.gets # everything your python script writes to stdout (usually using 'print') will be available using gets
 
       while temp != nil
           result << temp
