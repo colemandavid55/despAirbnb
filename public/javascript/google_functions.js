@@ -141,10 +141,9 @@ function dropPins(rooms) {
   }
 }
 
-google.maps.event.addDomListener(window, 'load', initialize);
-
 function genRooms() {
   var num_guests = $( "select[name='guests']" ).val();
   var mile_range = $( "select[name='range']" ).val();
+  google.maps.event.addDomListener(window, 'load', initialize);
   calcRoute(num_guests, mile_range);
 }

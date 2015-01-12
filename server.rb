@@ -14,8 +14,6 @@ class DespAirbnb::Server < Sinatra::Application
   SW = 0
   NE = 1
 
-  @@allRooms = []
-
   configure do
     enable :sessions
     # use Rack::Flash
@@ -42,6 +40,8 @@ class DespAirbnb::Server < Sinatra::Application
     @route = JSON.parse(params[:route]).to_a # <= Passed by Google Maps JS Frontend
     @range = params[:range].to_i
     @guests = params[:guests].to_i
+
+    @@allRooms = []
 
     # @route = [ [30.250130000000002, -97.74995000000001], [31.12553, -97.33818000000001], [31.636650000000003, -97.09597000000001], [31.64316, -97.09656000000001], [32.40263, -96.87293000000001] ]
     # @range = 10
