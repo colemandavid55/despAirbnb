@@ -41,16 +41,19 @@ function calcRoute(num_guests, mi_range) {
       var mypath = response.routes[0].overview_path;
       var submitpath = [];
       for (var x=0; x < mypath.length; x++){
-        submitpath.push([mypath.k, mypath.D]);
+        submitpath.push([mypath[x].k, mypath[x].D]);
       }
+      // console.log(submitpath)
+      // console.log(num_guests)
+      // console.log(mi_range)
 
       $.post("/rooms",
       {
-        route: submitpath,
+        route: JSON.stringify(submitpath),
         guests: num_guests,
         range: mi_range
-      },
-      function(data,status){
+      }).done(function(data){
+        debugger
         locations = jQuery.parseJSON("" + data);
         dropPins(locations)
       });
@@ -74,51 +77,79 @@ function codeAddress(address) {
   });
 }
 
-function dropPins(mylocations) {
-  //locations is an array
-  for (var i=0; i < mylocations.length; i++){
-  
-    var mycontent = '<div id="'+mylocations[i].id+'">'+
-        '<div id="siteNotice">'+
-        '</div>'+
-        '<h1 id="firstHeading" class="firstHeading">'+mylocations[i].location+'</h1>'+
-        '<div id="bodyContent">'+
-        '<p><a href="'+mylocations[i].roomUrl+'"><b>'+mylocations[i].name+'</b></a></p>'+
-        '<p>Price: $'+mylocations[i].price+'</p>'+
-        '<p><img src='+mylocations[i].imgUrl+'></img></p>'+
-        '</div>'+
-        '</div>';
+function dropPins(rooms) {
+  // Create a Maker and drop marker for each location
+  for (var i=0; i < rooms.length; i++){
+    // console.log(rooms[i]["room_id"])
 
-    var mypreview = '<p><a href="'+mylocations[i].roomUrl+'"><b>'+mylocations[i].name+'</b></a></p>';
+    room = rooms[i]
+
+    var latlng = new google.maps.LatLng(parseFloat(room.latitude), parseFloat(room.longitude))
+
+    /* Add The Place ID so we can identify it onclick() */
+    var latlng = new google.maps.LatLng(parseFloat(room.latitude), parseFloat(room.longitude))
+
+    debugger
+
+    var place = {
+      location: latlng,
+      placeId: room.room_id.toString()
+    }
 
     var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(parseFloat(mylocations[i].lattitude), parseFloat(mylocations[i].longitude)),
+        position: latlng,
         map: map,
-        title: mylocations[i].location,
-        html: mycontent,
-        prev: mypreview
+        place: place
     });
 
     google.maps.event.addListener(marker, 'click', function() {
-      infowindow.setContent(this.html)
+
+      
+
+      $.get('/rooms/' + this.getPlace().placeId)
+      .done(function(data,status){
+        var room = JSON.parse(data)
+        var htmlClickContent = '<div id="'+room.room_id+'">'+
+            '<div id="siteNotice">'+
+            '</div>'+
+            '<h2 id="mainHeading" class="mainHeading">'+room.name + ' - $' + room.price +'</h1>'+
+            '<div id="bodyContent">'+
+              '<p><img src='+room.imgUrl+'></img></p>'+
+              '<p><a href="'+room.roomUrl+'"><b>'+ 
+                room.name + " - " + room.location + ' - $' + room.price + '</b></a></p>'
+            '</div>'+
+            '</div>';
+
+        infowindow.setContent(htmlClickContent);       
+      });
+      map.panTo(this.getPosition());
       infowindow.open(map, this);
     });
 
     google.maps.event.addListener(marker, 'mouseover', function() {
-      infowindow.setContent(this.prev)
-      infowindow.open(map, this);
+
+      $.get('/rooms/' + this.getPlace().placeId)
+      .done(function(data,status){
+        var room = JSON.parse(data)
+
+        var htmlMouseoverContent = '<div id="'+room.room_id+'">'+
+            '<h3 id="prevHeading" class="prevHeading">'+room.name + ' - $' + room.price +'</h3>'+
+            '<div id="bodyContent">'+
+            '<p><img src='+room.imgUrl+' class="qtr"></img></p>'+
+            '</div>'+
+            '</div>';
+
+        infowindow.setContent(htmlMouseoverContent);  
+      });
+      infowindow.open(map, this); 
     });
   }
-
-  
-
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-$(document).on('click', $("button"), function(e){
-  e.preventDefault();
+function genRooms() {
   var num_guests = $( "select[name='guests']" ).val();
   var mile_range = $( "select[name='range']" ).val();
   calcRoute(num_guests, mile_range);
-});
+}

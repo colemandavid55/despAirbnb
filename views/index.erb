@@ -1,5 +1,16 @@
 <html>
-	<head><title>despAirBnb</title>
+
+	<head>
+		<title>despAirBnb</title>
+
+		<script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHXOgZv7Yea-WhQ2sgUr-Cs-IKGYIm30c">
+    </script>
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript"
+	    src="javascript/google_functions.js">
+	  </script>
+
 	<!-- 	<link type='text' href='/public/images/15-jpg.jpg'> -->
 		<style>
 		body {
@@ -39,21 +50,17 @@
 			width: 150px;
 			font-size: 30px;
 		}
-		</style>
-		<script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHXOgZv7Yea-WhQ2sgUr-Cs-IKGYIm30c">
-    </script>
-    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script type="text/javascript"
-      src="javascript/google_functions.js">
-    </script>
 
+		.qtr { width: 200px; height: 150px; }
+
+		</style>
+		
 	</head>
 	<body>
 		<center>
-		<h1>Welcome to despAir</h3>
+		<h1>Welcome to despAir</h1>
 		<div id='route'> 
-			<form name='location' method='get' action='/rooms'>
+			<form name='location'>
 				<input type='text' name='location' placeholder='enter your location'></input><br><br>
 				<input type='text' name='destination' placeholder='enter your destination'></input><br><br>
 				<select name='guests'>
@@ -78,11 +85,12 @@
 				</select>
 				<br>
 				<br>
-				<button type='submit' value='submit'>Submit!</button>
 			</form>
+			<button type="button" onclick="genRooms()">Search</button>
 
 		</div>
 		<div id='map-canvas'>
 		</div>
-	</center>
+		</center>
+  </body>
 </html>
