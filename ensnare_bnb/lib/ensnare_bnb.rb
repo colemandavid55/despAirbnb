@@ -35,8 +35,8 @@ module EnsnareBnb
       # New-York--NY--United-States
 
       # To create new (and to remove old) logfile, add File::CREAT like:
-      file = File.open('logfile.log', File::WRONLY | File::APPEND | File::CREAT)
-      logger = Logger.new(file)
+      # file = File.open('logfile.log', File::WRONLY | File::APPEND | File::CREAT)
+      # logger = Logger.new(file)
 
       city = opts.fetch(:city, nil)
       state = opts.fetch(:state, nil)
@@ -117,7 +117,6 @@ module EnsnareBnb
         # prevent bombarding the server with too many requests at once (default=>1)
         sleep(sleep_time)
       end
-      File.open("results.log", 'w') { |file| file.write(results.to_json) }
       results
     end
 
