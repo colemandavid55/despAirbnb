@@ -53,7 +53,6 @@ function calcRoute(num_guests, mi_range) {
         guests: num_guests,
         range: mi_range
       }).done(function(data){
-        debugger
         locations = jQuery.parseJSON("" + data);
         dropPins(locations)
       });
@@ -88,8 +87,6 @@ function dropPins(rooms) {
 
     /* Add The Place ID so we can identify it onclick() */
     var latlng = new google.maps.LatLng(parseFloat(room.latitude), parseFloat(room.longitude))
-
-    debugger
 
     var place = {
       location: latlng,
