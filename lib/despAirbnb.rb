@@ -44,9 +44,10 @@ module DespAirbnb
   end
 
   def self.get_room(rooms, room_id)
-    idx = rooms.index { |r| r[:id].to_i == room_id } 
+    idx = rooms.index { |r| r[:id] == room_id }
+    
     {
-      room_id: rooms[idx][:id].to_i,
+      room_id: rooms[idx][:id],
       name: rooms[idx][:name],
       price: rooms[idx][:price],
       location: rooms[idx][:location],
