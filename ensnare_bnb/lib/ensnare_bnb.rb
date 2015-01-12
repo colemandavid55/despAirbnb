@@ -65,10 +65,8 @@ module EnsnareBnb
       query = city_query + "?" + search_params.to_query + coord_query
 
       search_url = "#{base_url}/s/#{query}"
-
      
       pages = self.max_page_number(search_url)
-
 
       if (pages == 0) 
         pages = 1
@@ -81,20 +79,23 @@ module EnsnareBnb
       pages.times do |pg|
         url = "#{search_url}?room_types%5B%5D=Entire+home%2Fapt&page=#{pg + 1}"
 
-        Nokogiri::HTML(open(url)).css(".col-sm-12.col-md-6.row-space-2").each do |room|
+        Nokogiri::HTML(open(url)).css("div.col-sm-12.col-md-6.row-space-2").each do |room|
 
-          id       = room.css('.listing').first['data-id']
+          listing = room.css('.listing').first
+          img_listing = room.css(".listing-img-container > img").first
+
+          id       = listing['data-id']
           location = room.css('.listing-location').first.text.match(/ ([^·\n]*)\s+$/)[1]
-          name     = room.css('.listing').first['data-name']
-          lat      = room.css('.listing').first['data-lat']
-          lng      = room.css('.listing').first['data-lng']
-          url      = base_url + room.css('.listing').first['data-url']
+          name     = listing['data-name']
+          lat      = listing['data-lat']
+          lng      = listing['data-lng']
+          url      = base_url + listing['data-url']
           price    = room.css('.price-amount').first.text
-          img      = room.css(".listing-img-container > img").first['src']
+          img      = img_listing['src']
 
           # If default image was not found, use alternate images
           if (img.match(/no_photos/))
-            img      = JSON.parse(room.css(".listing-img-container > img").first['data-urls']).first
+            img = JSON.parse(img_listing['data-urls']).first
           end
 
           output = {
@@ -107,10 +108,6 @@ module EnsnareBnb
             roomUrl: url,
             imgUrl: img
           }
-
-          if (img.match(/no_photos/))
-            binding.pry
-          end
 
           results << output
         end

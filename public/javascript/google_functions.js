@@ -86,8 +86,6 @@ function dropPins(rooms) {
     var latlng = new google.maps.LatLng(parseFloat(room.latitude), parseFloat(room.longitude))
 
     /* Add The Place ID so we can identify it onclick() */
-    var latlng = new google.maps.LatLng(parseFloat(room.latitude), parseFloat(room.longitude))
-
     var place = {
       location: latlng,
       placeId: room.room_id.toString()
