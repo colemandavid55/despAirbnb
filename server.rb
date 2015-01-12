@@ -50,15 +50,16 @@ class DespAirbnb::Server < Sinatra::Application
 
     prevPoint = @route.first
 
-    # filteredRoute = []
-    filteredRoute = @route.slice(1,@route.length).select do |point|
-      if (DespAirbnb::Calculations.distance_between(prevPoint, point, {units: :mi}) > @range)
+    filteredRoute = []
+    filteredRoute = @route[1 .. @route.length].select do |point|
+      if (DespAirbnb::Calculations.distance_between(prevPoint, point, {units: :mi}) >= @range)
         prevPoint = point
         true
       else
         false
       end
     end
+
 
     # puts filteredRoute
     filteredRoute.unshift(@route.first)
