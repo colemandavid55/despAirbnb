@@ -145,8 +145,20 @@ function dropPins(rooms) {
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
+
+// $(document).on('click', 'button', function () {
+//      $('#map-canvas').css( { height: $(window).innerHeight()});
+//      google.maps.event.trigger(map, 'resize');
+//      $(this).prop("disabled", true);
+//     });
+
 function genRooms() {
   var num_guests = $( "select[name='guests']" ).val();
   var mile_range = $( "select[name='range']" ).val();
+  $('#map-canvas').css( { height: $(window).innerHeight()});
+     google.maps.event.trigger(map, 'resize');
+  $('button').prop("disabled", true);
   calcRoute(num_guests, mile_range);
+  $('button').prop("disabled", false);
 }
+
