@@ -38,6 +38,8 @@ module EnsnareBnb
       # file = File.open('logfile.log', File::WRONLY | File::APPEND | File::CREAT)
       # logger = Logger.new(file)
 
+      # logger.info("Start")
+
       city = opts.fetch(:city, nil)
       state = opts.fetch(:state, nil)
       country = opts.fetch(:country, nil)
@@ -74,47 +76,60 @@ module EnsnareBnb
         pages = opts.fetch(:max_pages, MAX_PAGES)
       end
 
-      results = []
+      @results = []
+
+      th = []
 
       pages.times do |pg|
-        url = "#{search_url}?room_types%5B%5D=Entire+home%2Fapt&page=#{pg + 1}"
 
-        Nokogiri::HTML(open(url)).css("div.col-sm-12.col-md-6.row-space-2").each do |room|
+        th[pg] = Thread.new {
 
-          listing = room.css('.listing').first
-          img_listing = room.css(".listing-img-container > img").first
+          # puts "Starting thread #{pg}"
 
-          id       = listing['data-id']
-          location = room.css('.listing-location').first.text.match(/ ([^·\n]*)\s+$/)[1]
-          name     = listing['data-name']
-          lat      = listing['data-lat']
-          lng      = listing['data-lng']
-          url      = base_url + listing['data-url']
-          price    = room.css('.price-amount').first.text
-          img      = img_listing['src']
+          url = "#{search_url}?room_types%5B%5D=Entire+home%2Fapt&page=#{pg + 1}"
 
-          # If default image was not found, use alternate images
-          if (img.match(/no_photos/))
-            img = JSON.parse(img_listing['data-urls']).first
+          Nokogiri::HTML(open(url)).css("div.col-sm-12.col-md-6.row-space-2").each do |room|
+
+            listing = room.css('.listing').first
+            img_listing = room.css(".listing-img-container > img").first
+
+            id       = listing['data-id']
+            location = room.css('.listing-location').first.text.match(/ ([^·\n]*)\s+$/)[1]
+            name     = listing['data-name']
+            lat      = listing['data-lat']
+            lng      = listing['data-lng']
+            url      = base_url + listing['data-url']
+            price    = room.css('.price-amount').first.text
+            img      = img_listing['src']
+
+            # If default image was not found, use alternate images
+            if (img.match(/no_photos/))
+              img = JSON.parse(img_listing['data-urls']).first
+            end
+
+            output = {
+              id:   id,
+              location: location,
+              name: name,
+              price: price.to_i,
+              latitude: lat,
+              longitude: lng,
+              roomUrl: url,
+              imgUrl: img
+            }
+
+            @results << output
           end
 
-          output = {
-            id:   id,
-            location: location,
-            name: name,
-            price: price.to_i,
-            latitude: lat,
-            longitude: lng,
-            roomUrl: url,
-            imgUrl: img
-          }
-
-          results << output
-        end
+          # puts "Finished thread #{pg}"
+        }
         # prevent bombarding the server with too many requests at once (default=>1)
         sleep(sleep_time)
       end
-      results
+      th.each {|t| t.join; }
+      # logger.info("Done")
+      # logger.close()
+      @results
     end
 
   end
